@@ -129,7 +129,7 @@ colnames(expression_data) <- gsub("Calu(\\d)","Calu3-\\1",colnames(expression_da
 
 bead_count <- joined_data %>% select(ends_with("nbeads"),ProbeID) %>% column_to_rownames("ProbeID")
 
-annotation_data <- joined_data %>% select(Symbol=Symbol_1,Name=X90.x,ProbeID) 
+annotation_data <- joined_data %>% select(Symbol=Symbol...89,Name=...90.x,ProbeID) 
 
 ```
 
