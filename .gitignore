@@ -39,3 +39,4 @@ vignettes/*.pdf
 .Renviron
 transcriptome/GEO/GEO_submission_DKFZ_SARSCov2.zip
 transcriptome/GEO/GA_illumina_expression.xls
+transcriptome/GEO/raw_CEL_files/GEO_submission_DKFZ_SARSCov2.zip
