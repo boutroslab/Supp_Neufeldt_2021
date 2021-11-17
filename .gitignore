@@ -37,3 +37,5 @@ vignettes/*.pdf
 
 # R Environment Variables
 .Renviron
+transcriptome/GEO/GEO_submission_DKFZ_SARSCov2.zip
+transcriptome/GEO/GA_illumina_expression.xls
