@@ -40,3 +40,9 @@ vignettes/*.pdf
 transcriptome/GEO/GEO_submission_DKFZ_SARSCov2.zip
 transcriptome/GEO/GA_illumina_expression.xls
 transcriptome/GEO/raw_CEL_files/GEO_submission_DKFZ_SARSCov2.zip
+transcriptome/GEO/raw_CEL_files/SARS_DKFZ_GEO.zip
+transcriptome/GEO/raw_CEL_files/all.raw.corrected.txt
+transcriptome/GEO/raw_CEL_files/all.qnorm.gv.txt
+transcriptome/GEO/raw_CEL_files/all.qnorm.gv.txt
+transcriptome/GEO/raw_CEL_files/all.qnorm.gv.corrected.txt
+transcriptome/GEO/raw_CEL_files/affy_chips01_all.raw.txt.geo.GPL23159.txt

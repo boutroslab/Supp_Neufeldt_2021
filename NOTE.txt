@@ -1,1 +1,1 @@
-Calu2-24h-mock.mean was wrongly labeled as Calu1-12h-infected.mean corrected based on missing value and doubled naming plut its position in the data table
+Calu2-24h-mock.mean was wrongly labeled as Calu1-12h-infected.mean corrected based on missing value and doubled naming plus its position in the data table

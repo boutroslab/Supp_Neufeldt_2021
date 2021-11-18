@@ -41,15 +41,15 @@ We load a number of packages whose functions are needed throughout the analysis
 ```{r message=F, warning=F, results='hide'}
 library(limma)
 library(ggrepel)
-library(lumi)
+#library(lumi)
 library(patchwork)
 library(ggrastr)
 library(pheatmap)
 library(fgsea)
 library(tidyverse)
-library(affy)
-library(affydata)
-library(affycoretools)
+#library(affy)
+#library(affydata)
+#library(affycoretools)
 library(gplots)
 library(RColorBrewer)
 library(eulerr)
@@ -59,8 +59,6 @@ library(eulerr)
 #Lets define some themes
 
 This we do as a quality of life step to give all figures that we produce a common look and feel.
-
-## B110 Theme
 
 ```{r theme, include=FALSE}
 
@@ -75,12 +73,6 @@ theme_b110 <- function(){
     legend.position = "bottom"
     )
 }
-
-```
-
-## B110 Colors
-
-```{r colors}
 
 sgi_blue    = '#5087C8'
 sgi_yellow1 = '#F2EE35'
@@ -105,17 +97,75 @@ Of note: In initial data Calu2-24h-mock.mean was wrongly labeled as Calu1-12h-in
 
 ```{r}
 
-#calu_data <- readxl::read_excel("Transcriptome/all.qnorm.gv.calu3.xlsx")
+calu_data <- read_delim("transcriptome/all.qnorm.gv.calu3.txt",delim = "\t")
 
-calu_data <- read_delim("Transcriptome/all.qnorm.gv.calu3.txt",delim = "\t")
-
-#a549_data <- readxl::read_excel("Transcriptome/all.qnorm.gv.a549.xlsx")
-
-a549_data <- read_delim("Transcriptome/all.qnorm.gv.a549.txt",delim = "\t")
+a549_data <- read_delim("transcriptome/all.qnorm.gv.a549.txt",delim = "\t")
 
 joined_data <- calu_data %>% left_join(a549_data,by = "ProbeID")
 
 ```
+
+prepare data for GEO submission
+
+```{r}
+
+normed_data <- joined_data %>% 
+  select(ProbeID,ends_with(c(".mean",".sd",".p",".nbeads"))) %>%
+  filter(grepl("^T",ProbeID))
+
+colnames(normed_data) <- gsub("Calu(\\d)(.+)","Calu3-\\1\\2",gsub("\\.","-",colnames(normed_data)))
+
+normed_data %<>% 
+  gather(dat,value,-ProbeID) %>%
+  separate(dat,c("cell_line","replicate","time","treatment","type"),remove = FALSE) %>%
+  mutate(time =factor(time,levels = c("4h","8h","12h","24h"))) %>%
+  mutate(treatment  =factor(treatment ,levels = c("mock","infected"))) %>% 
+  arrange(cell_line,replicate,time,treatment) %>%
+  mutate(dat = factor(dat,levels = unique(dat))) %>%
+  select(ProbeID,dat,value) %>%
+  spread(dat,value) %>%
+  rename(ID_REF=ProbeID)
+
+suspects <- colnames(normed_data)
+
+suspects = gsub(".*-sd","sd",gsub(".*-p","p-value",gsub(".*-nbeads","nbeads",gsub("(.*)-mean","\\1",suspects))))
+
+colnames(normed_data) <- suspects
+
+write_csv(normed_data,"transcriptome/GEO/raw_CEL_files/all.qnorm.gv.corrected.csv.gz")
+write_delim(normed_data,"transcriptome/GEO/raw_CEL_files/all.qnorm.gv.corrected.txt",delim = "\t")
+
+raw_data <- read_delim("transcriptome/GEO/raw_CEL_files/affy_chips01_all.raw.txt.geo.GPL23159.txt",delim = "\t") %>% 
+  select(-stop) %>%
+  filter(grepl("^T",ID_REF))
+
+mappings <- read_delim("transcriptome/GEO/raw_CEL_files/sample description.csv",delim = ";") 
+
+colnames(raw_data) <- gsub(".*(CN\\w{2}).* (\\w+)$","\\1_\\2",  colnames(raw_data))
+
+raw_data %<>%
+  gather(dat,value,-ID_REF) %>%
+  separate(dat,c("sampleID","type"),remove = FALSE) %>%
+  left_join(mappings)  %>%
+  mutate(time =factor(time,levels = c("4h","8h","12h","24h"))) %>%
+  mutate(treatment  =factor(treatment ,levels = c("mock","infected"))) %>% 
+  arrange(cell_line,replicate,time,treatment) %>%
+  unite("clname",cell_line,replicate,time,treatment,type,sep="-") %>%
+  mutate(clname = factor(clname,levels = unique(clname))) %>%
+  select(ID_REF,clname,value) %>%
+  spread(clname,value)
+
+suspects <- colnames(raw_data)
+
+suspects = gsub(".*-pvalue","pvalue",gsub(".*-nbeads","nbeads",gsub("(.*)-mean","\\1",suspects)))
+
+colnames(raw_data) <- suspects
+
+write_csv(raw_data,"transcriptome/GEO/raw_CEL_files/all.raw.corrected.csv.gz")
+write_delim(raw_data,"transcriptome/GEO/raw_CEL_files/all.raw.corrected.txt",delim = "\t")
+
+```
+
 
 ## Separate annotation and data
 
